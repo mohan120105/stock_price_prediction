@@ -7,7 +7,7 @@
 4. [Usage](#usage)
 5. [Technologies Used](#technologies-used)
 6. [Contributing](#contributing)
-7. [License](#license)
+
 
 ## Introduction
 This project is a real-time stock price prediction app built with Streamlit. 
