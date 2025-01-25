@@ -34,51 +34,53 @@ if stock_ticker == "Enter Custom Ticker":
 # User input for history period
 history_period = st.selectbox("Select history period:", ["1d", "2d", "5d", "1mo", "3mo", "6mo", "1y"])
 
-# Function to validate the stock ticker
-def is_valid_ticker(ticker):
-    try:
-        data = yf.Ticker(ticker)
-        df = data.history(period='1d')
-        return not df.empty
-    except:
-        return False
+# Button to trigger prediction
+if st.button("Predict Stock Price"):
+    # Function to validate the stock ticker
+    def is_valid_ticker(ticker):
+        try:
+            data = yf.Ticker(ticker)
+            df = data.history(period='1d')
+            return not df.empty
+        except:
+            return False
 
-# Ensure the user has selected or entered a stock ticker
-if stock_ticker:
-    # Check if the selected stock ticker is valid
-    if is_valid_ticker(stock_ticker):
-        # Fetch the data for the selected stock ticker
-        data = yf.Ticker(stock_ticker)
-        df = data.history(period=history_period)
+    # Ensure the user has selected or entered a stock ticker
+    if stock_ticker:
+        # Check if the selected stock ticker is valid
+        if is_valid_ticker(stock_ticker):
+            # Fetch the data for the selected stock ticker
+            data = yf.Ticker(stock_ticker)
+            df = data.history(period=history_period)
 
-        # Extract the required values
-        prev_close = df['Close'].iloc[-1]
-        open_price = df['Open'].iloc[-1]
-        high = df['High'].iloc[-1]
-        low = df['Low'].iloc[-1]
-        last = df['Close'].iloc[-1]
-        vwap = (df['Volume'] * df['Close']).sum() / df['Volume'].sum()
-        volume = df['Volume'].iloc[-1]
+            # Extract the required values
+            prev_close = df['Close'].iloc[-1]
+            open_price = df['Open'].iloc[-1]
+            high = df['High'].iloc[-1]
+            low = df['Low'].iloc[-1]
+            last = df['Close'].iloc[-1]
+            vwap = (df['Volume'] * df['Close']).sum() / df['Volume'].sum()
+            volume = df['Volume'].iloc[-1]
 
-        # Prepare the feature array for prediction
-        features = np.array([[prev_close, open_price, high, low, last, vwap, volume]])
-        # Predict the closing price
-        predicted_close = model.predict(features)
+            # Prepare the feature array for prediction
+            features = np.array([[prev_close, open_price, high, low, last, vwap, volume]])
+            # Predict the closing price
+            predicted_close = model.predict(features)
 
-        # Display the fetched real-time data
-        st.subheader(f'Real-time Data for {stock_ticker}:')
-        st.write(f"Prev Close: {prev_close}")
-        st.write(f"Open: {open_price}")
-        st.write(f"High: {high}")
-        st.write(f"Low: {low}")
-        st.write(f"Last: {last}")
-        st.write(f"VWAP: {vwap}")
-        st.write(f"Volume: {volume}")
+            # Display the fetched real-time data
+            st.subheader(f'Real-time Data for {stock_ticker}:')
+            st.write(f"Prev Close: {prev_close}")
+            st.write(f"Open: {open_price}")
+            st.write(f"High: {high}")
+            st.write(f"Low: {low}")
+            st.write(f"Last: {last}")
+            st.write(f"VWAP: {vwap}")
+            st.write(f"Volume: {volume}")
 
-        # Display the predicted closing price
-        st.subheader('Predicted Close Price:')
-        st.write(f"{predicted_close[0]:.2f}")
+            # Display the predicted closing price
+            st.subheader('Predicted Close Price:')
+            st.write(f"{predicted_close[0]:.2f}")
+        else:
+            st.error("Invalid stock ticker symbol. Please enter a valid stock ticker symbol.")
     else:
-        st.error("Invalid stock ticker symbol. Please enter a valid stock ticker symbol.")
-else:
-    st.warning("Please select or enter a stock ticker symbol to get predictions.")
+        st.warning("Please select or enter a stock ticker symbol to get predictions.")
